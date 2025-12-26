@@ -1,0 +1,4 @@
+* save basic info and schema into local memory and load it when the script load as a state (?)
+* allow CRUD from user on their on data
+* provide statistics and summarizations
+* price compare vs market
