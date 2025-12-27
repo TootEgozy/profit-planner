@@ -1,4 +1,4 @@
-from typing import TypedDict, List
+from typing import TypedDict, List, NotRequired
 from langgraph.graph import StateGraph, END
 from langchain_core.runnables.graph import MermaidDrawMethod
 import webbrowser
@@ -20,13 +20,10 @@ class ProjectState(TypedDict):
     after_event_time: float
 
 class InputState(TypedDict):
-    string_value: str
-    numeric_value: int
+    string_value: NotRequired[str]
+    numeric_value: NotRequired[int]
 
 def modify_state(input_state: InputState) -> InputState:
-    input_state['string_value'] += "!"
-    input_state['numeric_value'] += 1
-    print(f"modify_state executed: {input_state}")
     return input_state
 
 graph = StateGraph(InputState)
