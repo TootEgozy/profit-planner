@@ -2,3 +2,7 @@
 * allow CRUD from user on their on data
 * provide statistics and summarizations
 * price compare vs market
+
+
+
+* save a json file "save.json" in root folder. this file should hold relevant data from previous conversations such as user profession, project states / units. this will be loaded into the next conversations.
