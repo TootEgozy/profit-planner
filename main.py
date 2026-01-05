@@ -9,7 +9,7 @@ class Unit(TypedDict):
     name: str
     price: float
     price_with_vat: float
-    parts: List["Unit"]
+    items: List["Unit"]
     amount_needed: int
     amount_in_packet: int
     packet_price: float
@@ -20,11 +20,13 @@ class ProjectState(TypedDict):
     event_type: str
     participants_count: int
     pricing_offer: float
-    parts: List[Unit]
+    items: List[Unit]
     prep_time: float
     travel_time: float
     in_event_time: float
     after_event_time: float
+    catalog: dict
+    item_names: List[str]
 
 class InputState(TypedDict):
     string_value: NotRequired[str]
@@ -35,11 +37,13 @@ initial_state: ProjectState = {
     "event_type": "",
     "participants_count": 0,
     "pricing_offer": 0.0,
-    "parts": [],
+    "items": [],
     "prep_time": 0.0,
     "travel_time": 0.0,
     "in_event_time": 0.0,
     "after_event_time": 0.0,
+    "catalog": {},
+    "item_names": []
 }
 
 # ------------------------- nodes -----------------------
@@ -73,7 +77,7 @@ def load_price_catalog(path: str) -> dict:
 
 
 def collect_top_level_units() -> list[Unit]:
-    print("What are you making or buying for this event?")
+    print("Which items are you making or buying for this event?")
     print("Examples: Table arrangement, Bridal bouquet, Arch, Reception flowers")
     
     units = [Unit]
@@ -83,7 +87,7 @@ def collect_top_level_units() -> list[Unit]:
     for p in prodcuts:
         unit = {
             "amount_needed": int(input(f"How many {p}s? ").strip()),
-            "parts": [],
+            "items": [],
         }
 
         is_purchased = bool(input(f"Are you buying {p}?"))
@@ -97,13 +101,25 @@ def collect_top_level_units() -> list[Unit]:
         units.append(unit)
 
     return units
+
+def collect_units(state: ProjectState) -> ProjectState:
+    catalog_path = input("Enter a path to a pric catalog xlsx file, or press enter to skip: ")
+    if(catalog_path):
+        catalog = load_price_catalog(catalog_path)
+        state["catalog"] = catalog
+    units = collect_top_level_units()
+    state["items"] = units
+
+    return state
+
 # ---------------------- graph --------------------------
 
 graph = StateGraph(ProjectState)
 
 graph.add_node("collect_basic_info", collect_basic_info)
+graph.add_node("collect_units", collect_units)
 graph.set_entry_point("collect_basic_info")
-graph.add_edge("collect_basic_info", END)
+graph.add_edge("collect_units", END)
 
 runnable = graph.compile()
 
